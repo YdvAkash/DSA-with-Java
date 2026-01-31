@@ -1,0 +1,33 @@
+name: Auto Merge on Push
+
+on:
+  push:
+    branches:
+      - '*' # Runs on every branch push
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    # Prevent infinite loops by ensuring we don't run on the main branch itself if that's the target
+    if: github.ref != 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}
+          base: main
+          title: "Auto-merge: ${{ github.ref_name }} into main"
+          body: "Automated PR created from push to ${{ github.ref_name }}"
+
+      - name: Merge Pull Request
+        if: steps.cpr.outputs.pull-request-operation == 'created' || steps.cpr.outputs.pull-request-operation == 'updated'
+        uses: pascalgn/automerge-action@v0.15.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST: ${{ steps.cpr.outputs.pull-request-number }}
+          MERGE_METHOD: merge
