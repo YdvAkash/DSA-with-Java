@@ -36,5 +36,6 @@ public class BinaryTree {
         Node root = tree.buildTree(nodes);
         System.out.println("Root of the Binary Tree: " + root.data);
     }
+    
 
 }
