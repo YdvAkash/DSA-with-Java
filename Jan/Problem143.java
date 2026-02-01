@@ -87,5 +87,7 @@ public class Problem143 {
             head = head.next;
         }
         System.out.println("null");
+        System.out.println("null");
+        
     }
 }
